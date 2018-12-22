@@ -1,6 +1,7 @@
 # browsers
+[website](https://theheadlesssourceman.wordpress.com/2018/12/21/browsers-python-library/)
 
-This is intended to be a python wrapper around common web browser controls.
+This is intended to be a python wrapper around common web browser controls, making it easier to write html-based user interfaces on desktop systems.
 
 The idea is you specify what features you need, e.g:
  * transparency
