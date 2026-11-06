@@ -55,6 +55,6 @@ Status:
 * GTK Mozilla Embedded: Written but untested due to gtk install issues
 * Registered ActiveX browser components: Seems to work but has a crash, so disabled.
 * Supposedly there is a mozilla component called "HulaHop", but no web
-		presence, so assumed to be abandoned??
+        presence, so assumed to be abandoned??
   
   
