@@ -4,7 +4,7 @@
 Use a web browser based on a wxWebView control
 """
 import os
-from _browser import *
+from browsers._browser import *
 
 try:
 	import wx

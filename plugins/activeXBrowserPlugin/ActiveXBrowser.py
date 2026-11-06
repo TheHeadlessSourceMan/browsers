@@ -6,7 +6,7 @@ Any browser registered with the windows ActiveX system.
 Generally this means internet explorer or edge
 """
 import urllib
-from _browser import *
+from browsers._browser import *
 
 try:
 	from wx import *

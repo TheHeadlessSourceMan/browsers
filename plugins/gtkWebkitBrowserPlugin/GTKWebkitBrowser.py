@@ -4,7 +4,7 @@
 Pop up a webkit browser using GTK
 """
 from threading import thread
-from _browser import *
+from browsers._browser import *
 
 try:
 	import webkit

@@ -1,0 +1,15 @@
+[project]
+name="wxWebViewBrowserPlugin"
+version="1.0.0.0"
+description = "Browser plugin for the wxPython WebView."
+readme="README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies=["browsers"]
+
+[tool.setuptools.package-dir]
+wxWebViewBrowserPlugin = "."
+
+[project.entry-points."browsers.plugin"]
+wxWebViewBrowserPlugin='wxWebViewBrowserPlugin:WxWebViewBrowser'

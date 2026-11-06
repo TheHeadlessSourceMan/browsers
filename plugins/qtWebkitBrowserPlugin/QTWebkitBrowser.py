@@ -3,7 +3,7 @@
 """
 Open up a webkit browser in QT
 """
-from _browser import *
+from browsers._browser import *
 
 try:
 	from PyQt4.QtCore import *

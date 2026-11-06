@@ -1,0 +1,15 @@
+[project]
+name="standaloneBrowserPlugin"
+version="1.0.0.0"
+description = "Browser plugin for stand-alone browsers installed on the system."
+readme="README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies=["browsers"]
+
+[tool.setuptools.package-dir]
+standaloneBrowserPlugin = "."
+
+[project.entry-points."browsers.plugin"]
+standaloneBrowserPlugin='standaloneBrowserPlugin:StandaloneBrowser'

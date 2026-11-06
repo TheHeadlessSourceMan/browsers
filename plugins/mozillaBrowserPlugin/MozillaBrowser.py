@@ -3,7 +3,7 @@
 """
 Open up a mozilla browser using gtkmozembed
 """
-from _browser import *
+from browsers._browser import *
 
 try:
 	import urllib

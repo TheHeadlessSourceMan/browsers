@@ -1,0 +1,18 @@
+[project]
+name = "browsers"
+version = "1.0"
+description = "This project allows common access to all web browsers (based on feature)"
+readme = "README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["browsers"]
+
+[tool.setuptools.package-dir]
+browsers = "."

@@ -1,0 +1,15 @@
+[project]
+name="mozillaBrowserPlugin"
+version="1.0.0.0"
+description = "Browser plugin for the embedded GTK Mozilla browser."
+readme="README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies=["browsers"]
+
+[tool.setuptools.package-dir]
+mozillaBrowserPlugin = "."
+
+[project.entry-points."browsers.plugin"]
+mozillaBrowserPlugin='mozillaBrowserPlugin:MozillaBrowser'

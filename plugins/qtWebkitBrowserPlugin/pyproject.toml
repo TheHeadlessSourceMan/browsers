@@ -1,0 +1,15 @@
+[project]
+name="qtWebkitBrowserPlugin"
+version="1.0.0.0"
+description = "Browser plugin for QT Webkit (can also take screenshots)."
+readme="README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies=["browsers"]
+
+[tool.setuptools.package-dir]
+qtWebkitBrowserPlugin = "."
+
+[project.entry-points."browsers.plugin"]
+qtWebkitBrowserPlugin='qtWebkitBrowserPlugin:QTWebkitBrowser'

@@ -1,0 +1,15 @@
+[project]
+name="activeXBrowserPlugin"
+version="1.0.0.0"
+description = "Browser plugin for registered ActiveX browser components."
+readme="README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies=["browsers"]
+
+[tool.setuptools.package-dir]
+activeXBrowserPlugin = "."
+
+[project.entry-points."browsers.plugin"]
+activeXBrowserPlugin='activeXBrowserPlugin:ActiveXBrowser'

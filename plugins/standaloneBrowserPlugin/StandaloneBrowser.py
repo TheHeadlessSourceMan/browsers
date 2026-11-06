@@ -11,7 +11,7 @@ import signal
 import time
 from subprocess import Popen, PIPE
 import urllib
-from _browser import *
+from browsers._browser import *
 
 
 HERE=os.path.abspath(__file__).rsplit(os.sep,1)[0]+os.sep

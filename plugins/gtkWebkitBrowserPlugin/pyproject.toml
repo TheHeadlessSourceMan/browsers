@@ -1,0 +1,15 @@
+[project]
+name="gtkWebkitBrowserPlugin"
+version="1.0.0.0"
+description = "Browser plugin for GTK Webkit."
+readme="README.md"
+requires-python = ">= 3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies=["browsers"]
+
+[tool.setuptools.package-dir]
+gtkWebkitBrowserPlugin = "."
+
+[project.entry-points."browsers.plugin"]
+gtkWebkitBrowserPlugin='gtkWebkitBrowserPlugin:GTKWebKitBrowser'

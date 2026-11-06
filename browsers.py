@@ -18,8 +18,8 @@ stand-alone or embedded browser.
 	* Supposedly there is a mozilla component called "HulaHop", but no web
 		presence, so assumed to be abandoned.
 """
-import os
-from browser_interfaces._browser import BROWSER_LIST
+from importlib.metadata import entry_points
+from ._browser import BROWSER_LIST
 
 
 class Browsers(object):
@@ -37,18 +37,8 @@ class Browsers(object):
 		"""
 		if self._all is None:
 			# load all available browsers
-			here=os.path.abspath(__file__).rsplit(os.sep,1)[0]
-			if here.find('site-packages')>=0:
-				here=here.rsplit(os.sep,1)[0]
-			for inc in os.listdir(here+os.sep+'browser_interfaces'):
-				if inc.endswith('.py') and inc[0]!='_':
-					#last=len(BROWSER_LIST)
-					#print 'Checking',inc,'...',
-					exec('from browser_interfaces.'+inc[0:-3]+' import *')
-					#if last==len(BROWSER_LIST):
-					#	print 'NO'
-					#else:
-					#	print 'YES'
+			for plugin in entry_points(group='browsers.plugin'):
+				plugin.load()
 			self._all=BROWSER_LIST
 		return self._all
 
