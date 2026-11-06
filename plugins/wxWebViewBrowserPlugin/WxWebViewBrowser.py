@@ -5,7 +5,7 @@ Use a web browser based on a wxWebView control
 """
 import typing
 from paths import asUrl,UrlCompatible,Url
-from browsers import Browser,BROWSER_LIST
+from browsers import Browser
 
 try:
     import wx
@@ -28,6 +28,10 @@ class WxWebViewBrowser(Browser,wx.Frame):
 
     name='WxWebViewBrowser'
     family='webkit' # TODO: I think this may be different on different oses
+
+    @classmethod
+    def isAvailable(cls)->bool:
+        return hasWxWebview
 
     def __init__(self,
         url:typing.Optional[UrlCompatible]=None,
@@ -148,6 +152,3 @@ class WxWebViewBrowser(Browser,wx.Frame):
         """
         raise NotImplementedError() # TODO: implement window close
 
-
-if hasWxWebview:
-    BROWSER_LIST.append(WxWebViewBrowser)

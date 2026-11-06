@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">= 3.8"
 license = "MIT"
 license-files = ["LICENSE"]
+dependencies=["pluginTools"]
 
 [build-system]
 requires = ["setuptools >= 61.0.0"]

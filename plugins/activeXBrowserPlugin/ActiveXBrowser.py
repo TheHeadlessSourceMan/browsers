@@ -8,7 +8,7 @@ Generally this means internet explorer or edge
 import typing
 import urllib
 from paths import UrlCompatible,Url
-from browsers import Browser,BROWSER_LIST
+from browsers import Browser
 
 try:
     import wx
@@ -34,6 +34,10 @@ class ActiveXBrowser(Browser):
 
     name='ActiveXBrowser'
     family='ie'
+
+    @classmethod
+    def isAvailable(cls)->bool:
+        return hasActiveX
 
     def __init__(self,
         url:typing.Optional[UrlCompatible]=None,
@@ -106,6 +110,3 @@ class ActiveXBrowser(Browser):
         """
         raise NotImplementedError() # TODO:
 
-
-if hasActiveX:
-    BROWSER_LIST.append(ActiveXBrowser)

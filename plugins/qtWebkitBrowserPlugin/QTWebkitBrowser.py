@@ -6,7 +6,7 @@ Open up a webkit browser in QT
 import typing
 from PIL import Image
 from paths import Url,UrlCompatible
-from browsers import BROWSER_LIST,Browser
+from browsers import Browser
 try:
     from PyQt4.QtCore import *
     from PyQt4.QtGui import *
@@ -37,6 +37,10 @@ class QTWebkitBrowser(Browser):
 
     name='QTWebkitBrowser'
     family='webkit'
+
+    @classmethod
+    def isAvailable(cls)->bool:
+        return hasQTWebkit
 
     def __init__(self,
         url:typing.Optional[str]=None,
@@ -222,6 +226,3 @@ class QTWebkitBrowser(Browser):
         painter.end()
         return image
 
-
-if hasQTWebkit:
-    BROWSER_LIST.append(QTWebkitBrowser)

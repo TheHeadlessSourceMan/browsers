@@ -19,18 +19,21 @@ pretty much any stand-alone or embedded browser.
         presence, so assumed to be abandoned.
 """
 import typing
-from importlib.metadata import entry_points
 from paths import UrlCompatible
-from ._browser import BROWSER_LIST,Browser
+from pluginTools import PluginSystem
+from ._browser import Browser
 
 
-class Browsers(object):
+class Browsers(PluginSystem[Browser]):
     """
     A container class that allows searching of all browser implementaions
     currently available
     """
 
     _all:typing.Optional[typing.List[type]]=None
+
+    def __init__(self):
+        PluginSystem[Browser].__init__(self,'browsers.plugin')
 
     @property
     def all(self)->typing.List[type]:
@@ -39,9 +42,13 @@ class Browsers(object):
         """
         if self._all is None:
             # load all available browsers
-            for plugin in entry_points(group='browsers.plugin'):
-                plugin.load()
-            self._all=BROWSER_LIST
+            self._all=[]
+            for entryPoint in self.findPlugins():
+                try:
+                    pluginClass=entryPoint.load()
+                    self._all.extend(pluginClass.variants())
+                except Exception as e: # pylint: disable=broad-except
+                    print(f'Unable to load browser plugin {entryPoint.name}: {e}') # noqa: E501
         return self._all
 
     def _sort(self,

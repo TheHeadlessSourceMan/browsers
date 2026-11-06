@@ -5,16 +5,19 @@ The base class of what a browser looks like and what it can do.
 """
 import typing
 from paths import UrlCompatible,Url
+from pluginTools import Plugin
 if typing.TYPE_CHECKING:
     from PIL import Image
 
 
-BROWSER_LIST:typing.List["Browser"]=[] # list of all available browsers
-
-
-class Browser:
+class Browser(Plugin):
     """
     The base class of what a browser looks like and what it can do.
+
+    This is also the base class for all browsers plugins.
+    To register one, add to your pyproject.toml:
+        [project.entry-points."browsers.plugin"]
+        myBrowser='myPackage:MyBrowser'
     """
 
     canRunJS=False # can run javascript code we send it
@@ -40,6 +43,23 @@ class Browser:
         transparent:bool=False,
         embedIn:typing.Optional[typing.Any]=None):
         pass
+
+    @classmethod
+    def isAvailable(cls)->bool:
+        """
+        Can this browser be used on this system?
+        """
+        return True
+
+    @classmethod
+    def variants(cls)->typing.Iterable[typing.Type["Browser"]]:
+        """
+        The usable browser classes this plugin provides.
+
+        Override if one plugin represents several browsers.
+        """
+        if cls.isAvailable():
+            yield cls
 
     def runJS(self,js:str)->None:
         """

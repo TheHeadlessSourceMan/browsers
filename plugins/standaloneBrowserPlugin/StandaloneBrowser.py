@@ -13,7 +13,7 @@ import time
 from subprocess import Popen,PIPE
 import urllib
 from paths import FilePath,Url,UrlCompatible
-from browsers import BROWSER_LIST,Browser # noqa: F401,E501 # pylint: disable=unused-import
+from browsers import Browser
 
 
 HERE=os.path.abspath(__file__).rsplit(os.sep,1)[0]+os.sep
@@ -303,6 +303,25 @@ class StandaloneBrowser(Browser):
         self._url:typing.Optional[Url]=None
         self.browser=Popen(self.app)
 
+    @classmethod
+    def isAvailable(cls)->bool:
+        """
+        Determine if this browser application is available on the system.
+        """
+        return cls.app is not None
+
+    @classmethod
+    def variants(cls)->typing.Iterable[typing.Type[Browser]]:
+        """
+        One browser class for each browser application found on the system
+        """
+        if cls.app is not None:
+            yield cls
+            return
+        for i,(family,app) in enumerate(findAll()):
+            yield type(f'StandaloneBrowser{i}',(cls,),
+                {'family':family,'app':str(app)})
+
     def __del__(self):
         """
         Clean stuff up on object delete
@@ -385,16 +404,3 @@ class StandaloneBrowser(Browser):
         result=self.browser.wait()
         print('*** browser process completed')
         return result
-
-# automatically search the system and figure everything out
-i=0
-for family,app in findAll():
-	exec( # pylint: disable=exec-used
-		r"""class StandaloneBrowser"""+str(i)+"""(StandaloneBrowser):
-				family=r'"""+family+"""'
-				app='"""+str(app)+"""'
-				def __init__(self,url=None,w=800,h=600,title="",fullscreen=False,headless=False,transparent=False,embedIn=None):
-					StandaloneBrowser.__init__(self,url,w,h,title,fullscreen,headless,transparent,embedIn)
-		BROWSER_LIST.append(StandaloneBrowser"""+str(i)+""")
-		""")
-	i=i+1

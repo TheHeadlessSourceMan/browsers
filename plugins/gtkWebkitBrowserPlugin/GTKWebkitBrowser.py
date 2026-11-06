@@ -6,7 +6,7 @@ Pop up a webkit browser using GTK
 import typing
 from threading import Thread
 from paths import UrlCompatible,Url
-from browsers import Browser,BROWSER_LIST
+from browsers import Browser
 
 try:
     import webkit
@@ -27,6 +27,10 @@ class GTKWebKitBrowser(Browser):
 
     name='GTKWebKitBrowser'
     family='webkit'
+
+    @classmethod
+    def isAvailable(cls)->bool:
+        return hasGTKWebkit
 
     def __init__(self,url=None,w=800,h=600,title="",fullscreen=False,
         headless=False,transparent=False,embedIn=None):
@@ -77,6 +81,3 @@ class GTKWebKitBrowser(Browser):
         """
         asynchronous_gtk_message(gtk.main_quit)()
 
-
-if hasGTKWebkit:
-    BROWSER_LIST.append(GTKWebKitBrowser)

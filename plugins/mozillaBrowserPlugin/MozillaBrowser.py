@@ -6,7 +6,7 @@ Open up a mozilla browser using gtkmozembed
 import typing
 import threading
 from paths import Url,UrlCompatible
-from browsers import Browser,BROWSER_LIST
+from browsers import Browser
 
 try:
     import urllib
@@ -26,6 +26,10 @@ class MozillaBrowser(Browser):
 
     name='MozillaBrowser'
     family='mozilla'
+
+    @classmethod
+    def isAvailable(cls)->bool:
+        return hasMozillaEmbedded
 
     def __init__(self,
         url:typing.Optional[UrlCompatible]=None,
@@ -84,6 +88,3 @@ class MozillaBrowser(Browser):
         """
         asynchronous_gtk_message(gtk.main_quit)()
 
-
-if hasMozillaEmbedded:
-    BROWSER_LIST.append(MozillaBrowser)
