@@ -21,7 +21,7 @@ pretty much any stand-alone or embedded browser.
 import typing
 from paths import UrlCompatible
 from pluginTools import PluginSystem
-from ._browser import Browser,TypeOfBrowser
+from .browser import Browser,TypeOfBrowser
 
 
 class Browsers(PluginSystem[Browser]):
