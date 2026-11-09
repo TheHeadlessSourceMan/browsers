@@ -7,7 +7,7 @@ Generally this means internet explorer or edge
 """
 import typing
 import urllib
-from paths import UrlCompatible,Url
+from paths import UrlCompatible,Url,urlencode
 from browsers import Browser
 
 try:
@@ -46,13 +46,14 @@ class ActiveXBrowser(Browser):
         fullscreen:bool=False,
         headless:bool=False,
         transparent:bool=False,
-        embedIn:typing.Optional[wx.Window]=None):
+        embedIn:typing.Union[None,int,wx.Window]=None): # type: ignore
         """
         See http://wiki.wxpython.org/SynchronisingToInternetExplorer?highlight=(activex)
 
         https://www.codeproject.com/articles/3365/embed-an-html-control-in-your-own-window-using-pla
         """
-        Browser.__init__(self,url,w,h,title,fullscreen,headless,transparent,embedIn)
+        Browser.__init__(self,url,w,h,title,fullscreen,headless,transparent,
+            embedIn) # type: ignore
         self._url:typing.Optional[Url]=None
         clsid='{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}'
         module=EnsureModule(clsid,0,1,1)
@@ -82,10 +83,10 @@ class ActiveXBrowser(Browser):
         """
         Execute some javascript code
         """
-        self.url='javascript:'+urllib.quote(js+'\n;void(0);')
+        self.url='javascript:'+urlencode(js+'\n;void(0);')
 
     @property
-    def url(self):
+    def url(self)->typing.Optional[Url]:
         """
         get/set the current url
         """
@@ -98,7 +99,7 @@ class ActiveXBrowser(Browser):
         self._url=Url(url)
         self.browser.Navigate2(str(self._url))
 
-    def close(self):
+    def close(self)->None:
         """
         close this browser
         """
@@ -109,4 +110,3 @@ class ActiveXBrowser(Browser):
         Wait for the browser to close and return the exit code
         """
         raise NotImplementedError() # TODO:
-

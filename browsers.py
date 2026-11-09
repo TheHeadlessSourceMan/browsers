@@ -21,7 +21,10 @@ pretty much any stand-alone or embedded browser.
 import typing
 from paths import UrlCompatible
 from pluginTools import PluginSystem
-from .browser import Browser,TypeOfBrowser
+if __package__:
+    from .browser import Browser,TypeOfBrowser
+else:
+    from browser import Browser,TypeOfBrowser
 
 
 class Browsers(PluginSystem[Browser]):
@@ -33,7 +36,8 @@ class Browsers(PluginSystem[Browser]):
     _all:typing.Optional[typing.List[TypeOfBrowser]]=None
 
     def __init__(self):
-        PluginSystem[Browser].__init__(self,'browsers.plugin')
+        PluginSystem.__init__( # type: ignore
+            self,'browsers.plugin')
 
     @property
     def all(self)->typing.List[TypeOfBrowser]:

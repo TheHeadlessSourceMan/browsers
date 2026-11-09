@@ -5,7 +5,8 @@ Open up a webkit browser in QT
 """
 import typing
 from PIL import Image
-from paths import Url,UrlCompatible
+from threading import Thread
+from paths import Url,UrlCompatible,urlencode
 from browsers import Browser
 try:
     from PyQt4.QtCore import *
@@ -112,7 +113,7 @@ class QTWebkitBrowser(Browser):
         """
         Wait for the browser to completely go away
         """
-        if self.thread!=None:
+        if self.thread is not None:
             self.thread.join()
         return 0
 
@@ -225,4 +226,3 @@ class QTWebkitBrowser(Browser):
         self._page.mainFrame().render(painter)
         painter.end()
         return image
-

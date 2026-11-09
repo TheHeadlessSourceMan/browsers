@@ -70,7 +70,7 @@ class Browser(Plugin):
         raise NotImplementedError()
 
     @property
-    def url(self)->Url:
+    def url(self)->typing.Optional[Url]:
         """
         get/set the current url
         """

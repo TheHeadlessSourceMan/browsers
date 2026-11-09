@@ -80,4 +80,3 @@ class GTKWebKitBrowser(Browser):
         close this browser
         """
         asynchronous_gtk_message(gtk.main_quit)()
-

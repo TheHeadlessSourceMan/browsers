@@ -5,7 +5,7 @@ Open up a mozilla browser using gtkmozembed
 """
 import typing
 import threading
-from paths import Url,UrlCompatible
+from paths import Url,UrlCompatible,urlencode
 from browsers import Browser
 
 try:
@@ -66,7 +66,7 @@ class MozillaBrowser(Browser):
         """
         Execute some javascript code
         """
-        self.url='javascript:'+urllib.quote(js+'\n;void(0);')
+        self.url='javascript:'+urlencode(js+'\n;void(0);')
 
     @property
     def url(self)->typing.Optional[Url]:
@@ -87,4 +87,3 @@ class MozillaBrowser(Browser):
         close this browser
         """
         asynchronous_gtk_message(gtk.main_quit)()
-

@@ -40,9 +40,11 @@ Supported browsers:
 * full standalone browsers including:
   * firefox
   * palemoon
+  * brave
   * internet explorer
   * microsoft edge
   * google chrome
+  * Apple Safari
   * and will also try the "default browser" whatever that happens to be
   
 Status:
