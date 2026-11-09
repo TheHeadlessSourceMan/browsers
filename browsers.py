@@ -21,7 +21,7 @@ pretty much any stand-alone or embedded browser.
 import typing
 from paths import UrlCompatible
 from pluginTools import PluginSystem
-from ._browser import Browser
+from ._browser import Browser,TypeOfBrowser
 
 
 class Browsers(PluginSystem[Browser]):
@@ -30,13 +30,13 @@ class Browsers(PluginSystem[Browser]):
     currently available
     """
 
-    _all:typing.Optional[typing.List[type]]=None
+    _all:typing.Optional[typing.List[TypeOfBrowser]]=None
 
     def __init__(self):
         PluginSystem[Browser].__init__(self,'browsers.plugin')
 
     @property
-    def all(self)->typing.List[type]:
+    def all(self)->typing.List[TypeOfBrowser]:
         """
         A list of all available web browsers
         """
@@ -51,9 +51,10 @@ class Browsers(PluginSystem[Browser]):
                     print(f'Unable to load browser plugin {entryPoint.name}: {e}') # noqa: E501
         return self._all
 
-    def _sort(self,
-        browsers:typing.List[Browser],
-        preferences:typing.Optional[typing.List[str]]=None):
+    def _sorted(self,
+        browsers:typing.Iterable[TypeOfBrowser],
+        preferences:typing.Optional[typing.Iterable[str]]=None
+        )->typing.Iterable[TypeOfBrowser]:
         """
         sort a list of browsers in place, by preference
 
@@ -76,7 +77,9 @@ class Browsers(PluginSystem[Browser]):
         NOTE: if you catch yourself doing _sort(self.all), you should probably
             be using get() instead!
         """
-        def _rank(browser:Browser)->int:
+        if preferences is None:
+            preferences=[]
+        def _rank(browser:TypeOfBrowser)->int:
             """
             create a rank value for each available browser
             """
@@ -117,12 +120,12 @@ class Browsers(PluginSystem[Browser]):
                     rank+=1
                 rank=rank<<1
             return rank
-        browsers.sort(key=_rank)
+        return sorted(browsers,key=_rank)
 
     def _filtered(self,
-        browsers:typing.List[Browser],
-        requirements:typing.Optional[typing.List[str]]=None
-        )->typing.List[Browser]:
+        browsers:typing.Iterable[TypeOfBrowser],
+        requirements:typing.Optional[typing.Iterable[str]]=None
+        )->typing.Iterable[TypeOfBrowser]:
         """
         create a filtered list of browsers by requirements
 
@@ -144,7 +147,8 @@ class Browsers(PluginSystem[Browser]):
         NOTE: if you catch yourself doing _filtered(self.all),
             you should probably be using get() instead!
         """
-        ret:typing.List[Browser]=[]
+        if requirements is None:
+            requirements=[]
         for browser in browsers:
             isOk=True
             for req in requirements:
@@ -193,13 +197,12 @@ class Browsers(PluginSystem[Browser]):
                     isOk=False
                     break
             if isOk:
-                ret.append(browser)
-        return ret
+                yield browser
 
     def get(self,
         requirements:typing.Optional[typing.List[str]]=None,
         preferences:typing.Optional[typing.List[str]]=None
-        )->typing.List[Browser]:
+        )->typing.Iterable[TypeOfBrowser]:
         """
         get available browsers with the desired features
         (default is to list everything)
@@ -227,21 +230,22 @@ class Browsers(PluginSystem[Browser]):
         if requirements is not None and requirements:
             ret=self._filtered(self.all,requirements)
         else:
-            ret=list(self.all)
+            ret=self.all
         if preferences is not None and preferences:
-            self._sort(preferences)
+            ret=self._sorted(ret,preferences)
         return ret
 
     def create(self,
         url:typing.Optional[UrlCompatible]=None,
-        w:int=800,h=600,
+        w:int=800,h:int=600,
         title:str="",
-        fullscreen=False,
-        headless=False,
+        fullscreen:bool=False,
+        headless:bool=False,
         transparent:bool=False,
-        embedIn:typing.Optional[IndentationError]=None,
+        embedIn:typing.Optional[int]=None,
         requirements:typing.Optional[typing.List[str]]=None,
-        preferences:typing.Optional[typing.List[str]]=None):
+        preferences:typing.Optional[typing.List[str]]=None
+        )->typing.Optional[Browser]:
         """
         does a get(requirements,preferences)
         then creates the first browser in the list
@@ -263,94 +267,88 @@ class Browsers(PluginSystem[Browser]):
                 requirements.append('canDoTransparent')
             if embedIn is not None and 'canEmbed' not in requirements:
                 requirements.append('canEmbed')
-        browsers=self.get(requirements,preferences)
-        if len(browsers)<1:
-            return None
-        print('Starting browser:',browsers[0].__class__.__name__,
-            '-',browsers[0].name,'-',browsers[0].family)
-        return browsers[0](
-            url,w,h,title,fullscreen,headless,transparent,embedIn)
+        for browser in self.get(requirements,preferences):
+            print('Starting browser:',browser.__class__.__name__,
+                '-',browser.name,'-',browser.family)
+            return browser(
+                url,w,h,title,fullscreen,headless,transparent,embedIn)
+        return None
 
 
-if __name__ == '__main__':
-    import sys
-    # Use the Psyco python accelerator if available
-    # See:
-    #     http://psyco.sourceforge.net
-    try:
-        import psyco
-        psyco.full() # accelerate this program
-    except ImportError:
-        pass
+def cmdline(args:typing.Iterable[str])->int:
+    """
+    Run this like from the command line.
+    Args is the command line arguments WITHOUT the program name
+    """
     printhelp=False
-    if len(sys.argv)<2:
-        printhelp=True
-    else:
-        browsers=Browsers()
-        w=800
-        h=600
-        title=""
-        fullscreen=False
-        headless=False
-        transparent=False
-        embedIn=None
-        requirements=[]
-        preferences=[]
-        for arg in sys.argv[1:]:
-            if arg.startswith('-'):
-                arg=[a.strip() for a in arg.split('=',1)]
-                if arg[0] in ['-h','--help']:
-                    printhelp=True
-                elif arg[0]=='--list':
-                    for browser in browsers.get(requirements,preferences):
-                        print(browser.name,'('+browser.family+')')
-                elif arg[0]=='--create':
-                    url=None
-                    if len(arg)>1:
-                        url=arg[1]
-                    browser=browsers.create(url,w,h,title,fullscreen,headless,
-                        transparent,embedIn,requirements=requirements,
-                        preferences=preferences)
-                    if browser is None:
-                        print('No browser matches given requirements!')
-                elif arg[0]=='--requirements':
-                    requirements=[x.strip()
-                        for x in arg[1].replace("'",'').split(',')]
-                elif arg[0]=='--preferences':
-                    preferences=[x.strip()
-                        for x in arg[1].replace("'",'').split(',')]
-                elif arg[0]=='--w':
-                    if len(arg)>1:
-                        w=int(arg[1])
-                elif arg[0]=='--h':
-                    if len(arg)>1:
-                        h=int(arg[1])
-                elif arg[0]=='--title':
-                    if len(arg)>1:
-                        title=arg[1]
-                elif arg[0]=='--fullscreen':
-                    if len(arg)>1:
-                        fullscreen=arg[1][0] in ['y','Y','1','t','T']
-                    else:
-                        fullscreen=True
-                elif arg[0]=='--headless':
-                    if len(arg)>1:
-                        headless=arg[1][0] in ['y','Y','1','t','T']
-                    else:
-                        headless=True
-                elif arg[0]=='--transparent':
-                    if len(arg)>1:
-                        transparent=arg[1][0] in ['y','Y','1','t','T']
-                    else:
-                        transparent=True
-                elif arg[0]=='--embedIn':
-                    if len(arg)>1:
-                        embedIn=arg[1]
+    didSomething=False
+    browsers=Browsers()
+    w=800
+    h=600
+    title=""
+    fullscreen=False
+    headless=False
+    transparent=False
+    embedIn:typing.Optional[int]=None
+    requirements:typing.List[str]=[]
+    preferences:typing.List[str]=[]
+    for arg in args:
+        if arg.startswith('-'):
+            kv=[a.strip() for a in arg.split('=',1)]
+            if kv[0] in ['-h','--help']:
+                printhelp=True
+            elif kv[0]=='--list':
+                for browser in browsers.get(requirements,preferences):
+                    print(browser.name,'('+browser.family+')')
+                didSomething=True
+            elif kv[0]=='--create':
+                url=None
+                if len(kv)>1:
+                    url=kv[1]
+                browser=browsers.create(url,w,h,title,fullscreen,headless,
+                    transparent,embedIn,requirements=requirements,
+                    preferences=preferences)
+                if browser is None:
+                    print('No browser matches given requirements!')
+                didSomething=True
+            elif kv[0]=='--requirements':
+                requirements=[x.strip()
+                    for x in kv[1].replace("'",'').split(',')]
+            elif kv[0]=='--preferences':
+                preferences=[x.strip()
+                    for x in kv[1].replace("'",'').split(',')]
+            elif kv[0]=='--w':
+                if len(kv)>1:
+                    w=int(kv[1])
+            elif kv[0]=='--h':
+                if len(kv)>1:
+                    h=int(kv[1])
+            elif kv[0]=='--title':
+                if len(kv)>1:
+                    title=kv[1]
+            elif kv[0]=='--fullscreen':
+                if len(kv)>1:
+                    fullscreen=kv[1][0] in ['y','Y','1','t','T']
                 else:
-                    print('ERR: unknown argument "'+arg[0]+'"')
+                    fullscreen=True
+            elif kv[0]=='--headless':
+                if len(kv)>1:
+                    headless=kv[1][0] in ['y','Y','1','t','T']
+                else:
+                    headless=True
+            elif kv[0]=='--transparent':
+                if len(kv)>1:
+                    transparent=kv[1][0] in ['y','Y','1','t','T']
+                else:
+                    transparent=True
+            elif kv[0]=='--embedIn':
+                if len(kv)>1:
+                    embedIn=int(kv[1])
             else:
-                print('ERR: unknown argument "'+arg+'"')
-    if printhelp:
+                print('ERR: unknown argument "'+kv[0]+'"')
+        else:
+            print('ERR: unknown argument "'+arg+'"')
+    if printhelp or not didSomething:
         print('Usage:')
         print('  browsers.py [options]')
         print('Options (evaluated IN ORDER!):')
@@ -378,3 +376,10 @@ if __name__ == '__main__':
         print("   'canGetScreenshot'")
         print("   'canEmbed'")
         print("   'canDoTransparent'")
+        return -1
+    return 0
+
+
+if __name__ == '__main__':
+    import sys
+    sys.exit(cmdline(sys.argv[1:]))

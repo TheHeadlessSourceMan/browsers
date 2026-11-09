@@ -9,6 +9,8 @@ from pluginTools import Plugin
 if typing.TYPE_CHECKING:
     from PIL import Image
 
+TypeOfBrowser=typing.Type["Browser"]
+
 
 class Browser(Plugin):
     """
@@ -74,7 +76,7 @@ class Browser(Plugin):
         """
         raise NotImplementedError()
     @url.setter
-    def setUrl(self,url:UrlCompatible):
+    def url(self,url:UrlCompatible)->None:
         """
         get/set the current url
         """
@@ -87,7 +89,7 @@ class Browser(Plugin):
         """
         raise NotImplementedError()
     @html.setter
-    def setHtml(self,html:str):
+    def html(self,html:str)->None:
         """
         get/set the current html
         """
@@ -101,7 +103,7 @@ class Browser(Plugin):
         # TODO: default this to html() and text-to-html conversion
         raise NotImplementedError()
     @text.setter
-    def setText(self,text:str):
+    def text(self,text:str)->None:
         """
         get/set the current html via converting plain text
         """
